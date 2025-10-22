@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>E-bookMaker AI</title>
+  <style>
+    body { font-family: Arial; background: #0f172a; color: #fff; text-align: center; padding: 20px; }
+    input, button { padding: 10px; margin: 5px; border-radius: 6px; border: none; }
+    button { background: #7c3aed; color: #fff; cursor: pointer; }
+    .card { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin: 20px auto; width: 90%; max-width: 500px; }
+  </style>
+</head>
+<body>
+  <h1>📚 E-bookMaker AI</h1>
+  <div id="app"></div>
+
+  <script>
+    let token = localStorage.getItem("token");
+    const api = (url, method = "GET", data) => fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json", "Authorization": token ? "Bearer " + token : "" },
+      body: data ? JSON.stringify(data) : undefined
+    }).then(r => r.json());
+
+    async function register() {
+      const email = prompt("Email:");
+      const password = prompt("Senha:");
+      const res = await api("/api/register", "POST", { email, password });
+      if (res.token) { token = res.token; localStorage.setItem("token", token); alert("Cadastrado!"); showDashboard(); }
+      else alert(res.error);
+    }
+
+    async function login() {
+      const email = prompt("Email:");
+      const password = prompt("Senha:");
+      const res = await api("/api/login", "POST", { email, password });
+      if (res.token) { token = res.token; localStorage.setItem("token", token); showDashboard(); }
+      else alert(res.error);
+    }
+
+    async function generate() {
+      const theme = prompt("Tema do e-book:");
+      const pages = prompt("Nº de páginas:");
+      const res = await api("/api/generate", "POST", { theme, pages });
+      if (res.title) alert("✅ E-book criado: " + res.title);
+      else alert(res.error);
+      showDashboard();
+    }
+
+    async function showDashboard() {
+      const res = await api("/api/ebooks");
+      document.getElementById("app").innerHTML = `
+        <div class="card">
+          <button onclick="generate()">✏️ Criar e-book</button>
+          <button onclick="logout()">Sair</button>
+          <h3>Seus e-books</h3>
+          ${res.map(r => `<p>${r.title}</p>`).join("")}
+        </div>`;
+    }
+
+    function logout() { localStorage.clear(); token=null; location.reload(); }
+
+    if (token) showDashboard();
+    else document.getElementById("app").innerHTML = `
+      <div class="card">
+        <button onclick="login()">Entrar</button>
+        <button onclick="register()">Criar conta</button>
+      </div>`;
+  </script>
+</body>
+</html>
