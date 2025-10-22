@@ -5,6 +5,6 @@
     { "src": "/(.*)", "dest": "/index.html" }
   ],
   "functions": {
-    "api/index.js": { "runtime": "nodejs18.x", "maxDuration": 10 }
+    "api/**.js": { "runtime": "nodejs20.x" }
   }
 }
