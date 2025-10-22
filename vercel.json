@@ -3,5 +3,8 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
     { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  ],
+  "functions": {
+    "api/index.js": { "runtime": "nodejs18.x", "maxDuration": 10 }
+  }
 }
